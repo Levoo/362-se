@@ -8,7 +8,7 @@ pygame.init()
 pygame.font.init()
 
 
-class main_menu(object): # should rename to setup class
+class game_menu(object): # should rename to setup class
     def __init__(self, resolution, title_size, options_size, background, title_text, title_color, c_color,  c1_text ,c2_text, c3_text):
         self.screen = pygame.display.set_mode(resolution, 0)
         self.resolution = resolution
@@ -22,8 +22,9 @@ class main_menu(object): # should rename to setup class
         self.choice3 = self.menu_button.render(c3_text, True, c_color)
         self.screen.fill(self.background_color)
         self.menu_choice_tracker = 1
+        self.inMenu = False
 
-    def updateMenu(self):
+    def updateMainMenu(self):
         # if self.menu_choice_tracker
         if self.menu_choice_tracker == 1:
             self.choice1 = self.menu_button.render(self.mText[0], True, RED)
@@ -44,21 +45,31 @@ class main_menu(object): # should rename to setup class
         print("Tracker at " + str(self.menu_choice_tracker))  # debug info
         self.displayMenu()
 
-    def checkInput(self, str):
+    def checkMainMenuInput(self, str):
         if(str == "u"):
             if self.menu_choice_tracker > 1:
                 self.menu_choice_tracker -= 1
-                self.updateMenu()
-        else:
+                self.updateMainMenu()
+        elif (str == "d"):
             if self.menu_choice_tracker < 4:
                 self.menu_choice_tracker += 1
-                self.updateMenu()
+                self.updateMainMenu()
+        elif (str == "e" ):
+            if(self.menu_choice_tracker == 1):
+                print("Pseudo-start game")
+            elif(self.menu_choice_tracker == 2):
+                print("Pseudo-credit screen")
+            else:
+                print("Pseudo-quit...")
+                pygame.quit()
+                pygame.display.quit()
 
     def displayMenu(self): # move to adventrue game
         self.screen.blit(self.title, ( self.resolution[0] / 2 - 55,  self.resolution[1] / 2 - 200))
         self.screen.blit(self.choice1, ( self.resolution[0] / 2 - 30,  self.resolution[1] / 2 - 75))
         self.screen.blit(self.choice2, ( self.resolution[0] / 2 - 30,  self.resolution[1] / 2 - 35))
         self.screen.blit(self.choice3, ( self.resolution[0] / 2 - 30,  self.resolution[1] / 2 + 5))
+        self.inMenu = True
         pygame.display.update()
 
 
@@ -75,7 +86,7 @@ class AdvGame(object):
                 if event.type == pygame.KEYDOWN:
                     self.checkKeyboardInput(event)
 
-            pygame.display.update()
+            pygame.display.update() # fix this error
 
     def checkKeyboardInput(self, event): # change this to reflect user choice
         if event.key == pygame.K_LEFT:
@@ -83,17 +94,17 @@ class AdvGame(object):
         if event.key == pygame.K_RIGHT:
             print("right")
         if event.key == pygame.K_DOWN:
-            self.menuObj.checkInput("d")
+            self.menuObj.checkMainMenuInput("d")
         if event.key == pygame.K_UP:
-            self.menuObj.checkInput("u")
+            self.menuObj.checkMainMenuInput("u")
         if event.key == pygame.K_RETURN:
-            print("enter")
+            self.menuObj.checkMainMenuInput("e")
 
 
 def main():
-    menu = main_menu(res, 50, 35, bg, "MENU", (0, 0, 0), (0, 0, 0), "START", "CREDITS", "QUIT")
+    menuObj = game_menu(res, 50, 35, bg, "MENU", (0, 0, 0), (0, 0, 0), "START", "CREDITS", "QUIT")
     #menu.displayMenu()
-    game = AdvGame(menu)
+    game = AdvGame(menuObj)
     game.startGame()
 
 if __name__ == '__main__':
