@@ -7,8 +7,23 @@ RED = (255, 0, 0)
 pygame.init()
 pygame.font.init()
 
+weapon = ["Sword", "Gun", "Pencil"] # for testing later this shsould be populated from a file
 
-class game_menu(object): # should rename to setup class
+class playerr(object):
+    def __init__(self):
+        self.player_health = 100
+        self.player_items = []
+        self.player_flags = []
+        self.player_name = "JOJO"
+
+    def reducePlayerHealth(self, damage):
+        self.player_health -= damage
+    def addPlayerFlag(self, flag):
+        self.player_flags.append(flag)
+    def addPlayerItem(self, newItem):
+        self.player_items.append(newItem)
+
+class user_interface(object): # anything with menu in name is exlusive to menu else ingame ui
     def __init__(self, resolution, title_size, options_size, background, title_text, title_color, c_color,  c1_text ,c2_text, c3_text):
         self.screen = pygame.display.set_mode(resolution, 0)
         self.resolution = resolution
@@ -56,13 +71,11 @@ class game_menu(object): # should rename to setup class
                 self.updateMainMenu()
         elif (str == "e" ):
             if(self.menu_choice_tracker == 1):
-                print("Pseudo-start game")
+                self.inMenu = False
             elif(self.menu_choice_tracker == 2):
                 print("Pseudo-credit screen")
             else:
                 print("Pseudo-quit...")
-                pygame.quit()
-                pygame.display.quit()
 
     def displayMenu(self): # move to adventrue game
         self.screen.blit(self.title, ( self.resolution[0] / 2 - 55,  self.resolution[1] / 2 - 200))
@@ -72,10 +85,26 @@ class game_menu(object): # should rename to setup class
         self.inMenu = True
         pygame.display.update()
 
+    def getState(self):
+        return self.inMenu
+    # above is for menu stuff------------------------------------
+    #below is game ui stuff
+    def getTracker(self):
+        return self.menu_choice_tracker
+
+    def displayGameUI(self):
+        print("display the stuff")
+
+    def updateGameUI(self):
+        pass
+    def checkInGameInput(self):
+        pass
 
 class AdvGame(object):
-    def __init__(self, obj):
-        self.menuObj = obj
+    def __init__(self, mobj, pobj):
+        self.menuObj = mobj
+        self.p1 = pobj
+        self.inGame = False
     def startGame(self):
         self.menuObj.displayMenu()
         running = True
@@ -88,23 +117,40 @@ class AdvGame(object):
 
             pygame.display.update() # fix this error
 
-    def checkKeyboardInput(self, event): # change this to reflect user choice
+    def checkKeyboardInput(self, event): # change this to reflect user choice, used for both menu and game nav
         if event.key == pygame.K_LEFT:
-            print("left")
+            if(self.menuObj.getState() == False):
+                print("Moving left, while in game!")
         if event.key == pygame.K_RIGHT:
-            print("right")
+            if (self.menuObj.getState() == False):
+                print("Moving right, while in game")
         if event.key == pygame.K_DOWN:
-            self.menuObj.checkMainMenuInput("d")
+            if(self.menuObj.getState() == True):
+                self.menuObj.checkMainMenuInput("d")
+                print("key down")
         if event.key == pygame.K_UP:
-            self.menuObj.checkMainMenuInput("u")
+            if (self.menuObj.getState() == True):
+                self.menuObj.checkMainMenuInput("u")
+                print("key up")
         if event.key == pygame.K_RETURN:
-            self.menuObj.checkMainMenuInput("e")
+            if (self.menuObj.getState() == True): # takes care of menu inputs
+                self.menuObj.checkMainMenuInput("e")
+            elif (self.menuObj.getTracker() == 1 and self.menuObj.getState() == False and self.inGame == False):
+                self.prepInGame()  # starts game now enter will be used to get choices
+            else: # this means we are in game!!
+                print("Upadate choice of user")
 
+    def prepInGame(self):
+        print ("Now in game!") # debug info
+        self.menuObj.screen.fill(bg) # set up stuff to start displaying the stuff
+        self.inGame = True
+        self.menuObj.displayGameUI()
 
 def main():
-    menuObj = game_menu(res, 50, 35, bg, "MENU", (0, 0, 0), (0, 0, 0), "START", "CREDITS", "QUIT")
+    ui = user_interface(res, 50, 35, bg, "MENU", (0, 0, 0), (0, 0, 0), "START", "CREDITS", "QUIT")
+    player_one = playerr()
     #menu.displayMenu()
-    game = AdvGame(menuObj)
+    game = AdvGame(ui, player_one)
     game.startGame()
 
 if __name__ == '__main__':
