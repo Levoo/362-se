@@ -135,8 +135,8 @@ class AdvGame(object):
         if event.key == pygame.K_RETURN:
             if (self.menuObj.getState() == True): # takes care of menu inputs
                 self.menuObj.checkMainMenuInput("e")
-            elif (self.menuObj.getTracker() == 1 and self.menuObj.getState() == False and self.inGame == False):
-                self.prepInGame()  # starts game now enter will be used to get choices
+                if (self.menuObj.getTracker() == 1 and self.menuObj.getState() == False and self.inGame == False):
+                    self.prepInGame()  # starts game now enter will be used to get choices
             else: # this means we are in game!!
                 print("Upadate choice of user")
 
