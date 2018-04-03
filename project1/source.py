@@ -39,6 +39,7 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
         self.screen.fill(self.background_color)
         self.menu_choice_tracker = 1
         self.inMenu = False
+        self.prepF = False
 
     def updateMainMenu(self):
         # if self.menu_choice_tracker
@@ -93,22 +94,52 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
     def getTracker(self):
         return self.menu_choice_tracker
 
-    def displayGameUI(self): # WIP WIP WIP WIP
-        pygame.draw.rect(self.screen, blk, (300, 150, 100, 50))
-
-        self.choice1 = self.menu_button.render("c1", True, RED)
-        self.choice2 = self.menu_button.render("c2", True, bg)
-        self.choice3 = self.menu_button.render("c3", True, bg)
+    def displayGameUI(self): # WIP WIP WIP WIP have text and choice plus image of background and then img of char or enemy
+        pygame.draw.rect(self.screen, blk, (0, self.resolution[1] / 2  + 200, 1200, 50))
         #--
+        if(self.prepF):
+            self.choice1 = self.menu_button.render("c1", True, RED)
+            self.choice2 = self.menu_button.render("c2", True, bg)
+            self.choice3 = self.menu_button.render("c3", True, bg)
+            self.prepF = False
+
         self.screen.blit(self.choice1, (self.resolution[0] / 2 - 425, self.resolution[1] / 2  + 200))
         self.screen.blit(self.choice2, (self.resolution[0] / 2, self.resolution[1] / 2 + 200))
         self.screen.blit(self.choice3, (self.resolution[0] / 2 + 380, self.resolution[1] / 2 + 200))
+        pygame.display.update()
         print("display the stuff")
 
-    def updateGameUI(self):
-        pass
-    def checkInGameInput(self):
-        pass
+    def updateGameUI(self): # redundent??
+        if self.menu_choice_tracker == 1:
+            self.choice1 = self.menu_button.render("c1", True, RED)
+            self.choice2 = self.menu_button.render("c2", True, bg)
+            self.choice3 = self.menu_button.render("c3", True, bg)
+        if self.menu_choice_tracker == 2:
+            self.choice1 = self.menu_button.render("c1", True, bg)
+            self.choice2 = self.menu_button.render("c2", True, RED)
+            self.choice3 = self.menu_button.render("c3", True, bg)
+        if self.menu_choice_tracker == 3:
+            self.choice1 = self.menu_button.render("c1", True, bg)
+            self.choice2 = self.menu_button.render("c2", True, bg)
+            self.choice3 = self.menu_button.render("c3", True, RED)
+        if self.menu_choice_tracker > 3:
+            self.menu_choice_tracker = 3
+        if self.menu_choice_tracker < 1:
+            self.menu_choice_tracker = 1
+        print("Tracker at " + str(self.menu_choice_tracker))  # debug info
+        self.displayGameUI()
+
+    def checkInGameInput(self, str):
+        if (str == "l"):
+            if self.menu_choice_tracker > 1:
+                self.menu_choice_tracker -= 1
+                self.updateGameUI()
+        elif (str == "r"):
+            if self.menu_choice_tracker < 4:
+                self.menu_choice_tracker += 1
+                self.updateGameUI()
+        elif (str == "e"):
+            print ("Choice notted update next")
 
 class AdvGame(object):
     def __init__(self, mobj, pobj):
@@ -130,9 +161,11 @@ class AdvGame(object):
     def checkKeyboardInput(self, event): # change this to reflect user choice, used for both menu and game nav
         if event.key == pygame.K_LEFT:
             if(self.menuObj.getState() == False):
+                self.menuObj.checkInGameInput("l")
                 print("Moving left, while in game!")
         if event.key == pygame.K_RIGHT:
             if (self.menuObj.getState() == False):
+                self.menuObj.checkInGameInput("r")
                 print("Moving right, while in game")
         if event.key == pygame.K_DOWN:
             if(self.menuObj.getState() == True):
@@ -148,12 +181,14 @@ class AdvGame(object):
                 if (self.menuObj.getTracker() == 1 and self.menuObj.getState() == False and self.inGame == False):
                     self.prepInGame()  # starts game now enter will be used to get choices
             else: # this means we are in game!!
-                print("Upadate choice of user")
+                self.menuObj.checkInGameInput("e")
 
     def prepInGame(self):
         print ("Now in game!") # debug info
         self.menuObj.screen.fill(bg) # set up stuff to start displaying the stuff
         self.inGame = True
+        self.menuObj.menu_choice_tracker = 1
+        self.menuObj.prepF = True
         self.menuObj.displayGameUI()
 
 def main():
