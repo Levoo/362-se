@@ -2,6 +2,7 @@ import os, sys
 import  pygame
 from pygame.locals import *
 bg = (255, 255, 255)
+blk = (0, 0, 0)
 res = [1200, 720]
 RED = (255, 0, 0)
 pygame.init()
@@ -92,7 +93,16 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
     def getTracker(self):
         return self.menu_choice_tracker
 
-    def displayGameUI(self):
+    def displayGameUI(self): # WIP WIP WIP WIP
+        pygame.draw.rect(self.screen, blk, (300, 150, 100, 50))
+
+        self.choice1 = self.menu_button.render("c1", True, RED)
+        self.choice2 = self.menu_button.render("c2", True, bg)
+        self.choice3 = self.menu_button.render("c3", True, bg)
+        #--
+        self.screen.blit(self.choice1, (self.resolution[0] / 2 - 425, self.resolution[1] / 2  + 200))
+        self.screen.blit(self.choice2, (self.resolution[0] / 2, self.resolution[1] / 2 + 200))
+        self.screen.blit(self.choice3, (self.resolution[0] / 2 + 380, self.resolution[1] / 2 + 200))
         print("display the stuff")
 
     def updateGameUI(self):
