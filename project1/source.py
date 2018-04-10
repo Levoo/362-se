@@ -8,7 +8,14 @@ RED = (255, 0, 0)
 pygame.init()
 pygame.font.init()
 
-weapon = ["Sword", "Gun", "Pencil"] # for testing later this shsould be populated from a file
+Choice_list = [{"Sword":4000, "Gun":1000, "Fish":500}, {"Fight": None, "Run": None, "Negotiate":None}] # for testing later this shsould be populated from a file
+text_put =  ["You are about to embark on adventure. It’s dangerous to go alone, however. You enter a weapons shop and see various weapons, but only three catch your eye. You can only buy one. Select your weapon.",
+             ["You take your <weapon> and set off. At the middle of the mountain path, you are confronted by a highway bandit with a knife. He demands everything you are carrying. What do you do?",
+              ["With your sword, you effortlessly slay the bandit.", "win"],
+              ["The bandit stabs through your banana and pierces your skin. He proceeds to continue stabbing until you take your last breath.", "dead"],
+              ["Thanks to your large fish, the bandit only manages to cut you, but by some miracle the bone breaks his knife. You lose consciousness, and when you wake up you noticed that you lost 2000 gold.", "loss"],
+             ]]
+img_list = ["placeholder.png"]
 
 class playerr(object):
     def __init__(self):
@@ -30,12 +37,14 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
         self.resolution = resolution
         self.menu_title = pygame.font.SysFont('Times New Roman', title_size)
         self.menu_button = pygame.font.SysFont('Times New Roman', options_size)
+        self.gt_options = pygame.font.SysFont('Times New Roman', 14)
         self.background_color = background
         self.title = self.menu_title.render(title_text, True, title_color)
         self.mText = [c1_text, c2_text, c3_text]
         self.choice1 = self.menu_button.render(c1_text, True, RED)
         self.choice2 = self.menu_button.render(c2_text, True, c_color)
         self.choice3 = self.menu_button.render(c3_text, True, c_color)
+        self.gText = self.gt_options.render(text_put[0], True, blk)
         self.screen.fill(self.background_color)
         self.menu_choice_tracker = 1
         self.inMenu = False
@@ -95,33 +104,36 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
         return self.menu_choice_tracker
 
     def displayGameUI(self): # WIP WIP WIP WIP have text and choice plus image of background and then img of char or enemy
-        pygame.draw.rect(self.screen, blk, (0, self.resolution[1] / 2  + 200, 1200, 50))
+        pygame.draw.rect(self.screen, blk, (0, 650, 1200, 75))
+        img = pygame.image.load(img_list[0])
+        self.screen.blit(img, (self.resolution[0] / 2 - 150, 50))
         #--
         if(self.prepF):
-            self.choice1 = self.menu_button.render("c1", True, RED)
-            self.choice2 = self.menu_button.render("c2", True, bg)
-            self.choice3 = self.menu_button.render("c3", True, bg)
+            self.choice1 = self.menu_button.render(list(Choice_list[0].keys())[0], True, RED)
+            self.choice2 = self.menu_button.render(list(Choice_list[0].keys())[1], True, bg)
+            self.choice3 = self.menu_button.render(list(Choice_list[0].keys())[2], True, bg)
             self.prepF = False
 
-        self.screen.blit(self.choice1, (self.resolution[0] / 2 - 425, self.resolution[1] / 2  + 200))
-        self.screen.blit(self.choice2, (self.resolution[0] / 2, self.resolution[1] / 2 + 200))
-        self.screen.blit(self.choice3, (self.resolution[0] / 2 + 380, self.resolution[1] / 2 + 200))
+        self.screen.blit(self.gText, (20, self.resolution[1] / 2 + 150))
+        self.screen.blit(self.choice1, (self.resolution[0] / 2 - 425, self.resolution[1] / 2  + 300))
+        self.screen.blit(self.choice2, (self.resolution[0] / 2, self.resolution[1] / 2 + 300))
+        self.screen.blit(self.choice3, (self.resolution[0] / 2 + 380, self.resolution[1] / 2 + 300))
         pygame.display.update()
         print("display the stuff")
 
     def updateGameUI(self): # redundent??
         if self.menu_choice_tracker == 1:
-            self.choice1 = self.menu_button.render("c1", True, RED)
-            self.choice2 = self.menu_button.render("c2", True, bg)
-            self.choice3 = self.menu_button.render("c3", True, bg)
+            self.choice1 = self.menu_button.render(list(Choice_list[0].keys())[0], True, RED)
+            self.choice2 = self.menu_button.render(list(Choice_list[0].keys())[1], True, bg)
+            self.choice3 = self.menu_button.render(list(Choice_list[0].keys())[2], True, bg)
         if self.menu_choice_tracker == 2:
-            self.choice1 = self.menu_button.render("c1", True, bg)
-            self.choice2 = self.menu_button.render("c2", True, RED)
-            self.choice3 = self.menu_button.render("c3", True, bg)
+            self.choice1 = self.menu_button.render(list(Choice_list[0].keys())[0], True, bg)
+            self.choice2 = self.menu_button.render(list(Choice_list[0].keys())[1], True, RED)
+            self.choice3 = self.menu_button.render(list(Choice_list[0].keys())[2], True, bg)
         if self.menu_choice_tracker == 3:
-            self.choice1 = self.menu_button.render("c1", True, bg)
-            self.choice2 = self.menu_button.render("c2", True, bg)
-            self.choice3 = self.menu_button.render("c3", True, RED)
+            self.choice1 = self.menu_button.render(list(Choice_list[0].keys())[0], True, bg)
+            self.choice2 = self.menu_button.render(list(Choice_list[0].keys())[1], True, bg)
+            self.choice3 = self.menu_button.render(list(Choice_list[0].keys())[2], True, RED)
         if self.menu_choice_tracker > 3:
             self.menu_choice_tracker = 3
         if self.menu_choice_tracker < 1:
