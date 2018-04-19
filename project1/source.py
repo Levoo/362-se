@@ -5,16 +5,18 @@ bg = (255, 255, 255)
 blk = (0, 0, 0)
 res = [1200, 720]
 RED = (255, 0, 0)
+
 pygame.init()
 pygame.font.init()
 
-Choice_list = [{"Sword":4000, "Gun":1000, "Fish":500}, {"Fight": None, "Run": None, "Negotiate":None}] # for testing later this shsould be populated from a file
+Choice_list = [ {"Sword":4000, "Gun":1000, "Fish":500}, {"Fight": None, "Run": None, "Negotiate":None}, {"Sure":None, "Nah":None, "":None},
+                {"Kill":None, "Donate":None, "Give life advice":None}
+              ] # for testing later this shsould be populated from a file
 text_put =  ["You are about to embark on adventure. It’s dangerous to go alone, however. You enter a weapons shop and see various weapons, but only three catch your eye. You can only buy one. Select your weapon.",
-             ["You take your <weapon> and set off. At the middle of the mountain path, you are confronted by a highway bandit with a knife. He demands everything you are carrying. What do you do?",
-              ["With your sword, you effortlessly slay the bandit.", "win"],
-              ["The bandit stabs through your banana and pierces your skin. He proceeds to continue stabbing until you take your last breath.", "dead"],
-              ["Thanks to your large fish, the bandit only manages to cut you, but by some miracle the bone breaks his knife. You lose consciousness, and when you wake up you noticed that you lost 2000 gold.", "loss"],
-             ]]
+                "You take your <weapon> and set off. At the middle of the mountain path, you are confronted by a highway bandit with a knife. He demands everything you are carrying. What do you do?",
+                "test 2", 
+                "test 3"
+            ]
 img_list = ["placeholder.png"]
 
 class playerr(object):
@@ -44,7 +46,9 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
         self.choice1 = self.menu_button.render(c1_text, True, RED)
         self.choice2 = self.menu_button.render(c2_text, True, c_color)
         self.choice3 = self.menu_button.render(c3_text, True, c_color)
+        self.gTextCounter = 0
         self.gText = self.gt_options.render(text_put[0], True, blk)
+        self.gameChoiceCounter = 0
         self.screen.fill(self.background_color)
         self.menu_choice_tracker = 1
         self.inMenu = False
@@ -99,12 +103,13 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
     def getState(self):
         return self.inMenu
     # above is for menu stuff------------------------------------
-    #below is game ui stuff
+    #below is game ui stuff ------------------------------------
     def getTracker(self):
         return self.menu_choice_tracker
 
     def displayGameUI(self): # WIP WIP WIP WIP have text and choice plus image of background and then img of char or enemy
         pygame.draw.rect(self.screen, blk, (0, 650, 1200, 75))
+        pygame.draw.rect(self.screen, bg, (0, self.resolution[1] / 2 + 150, 1200, 75))
         img = pygame.image.load(img_list[0])
         self.screen.blit(img, (self.resolution[0] / 2 - 150, 50))
         #--
@@ -123,22 +128,26 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
 
     def updateGameUI(self): # redundent??
         if self.menu_choice_tracker == 1:
-            self.choice1 = self.menu_button.render(list(Choice_list[0].keys())[0], True, RED)
-            self.choice2 = self.menu_button.render(list(Choice_list[0].keys())[1], True, bg)
-            self.choice3 = self.menu_button.render(list(Choice_list[0].keys())[2], True, bg)
+            self.choice1 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[0], True, RED)
+            self.choice2 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[1], True, bg)
+            self.choice3 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[2], True, bg)
+           # self.gText = self.gt_options.render(text_put[self.gTextCounter], True, blk)
         if self.menu_choice_tracker == 2:
-            self.choice1 = self.menu_button.render(list(Choice_list[0].keys())[0], True, bg)
-            self.choice2 = self.menu_button.render(list(Choice_list[0].keys())[1], True, RED)
-            self.choice3 = self.menu_button.render(list(Choice_list[0].keys())[2], True, bg)
+            self.choice1 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[0], True, bg)
+            self.choice2 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[1], True, RED)
+            self.choice3 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[2], True, bg)
+            #self.gText = self.gt_options.render(text_put[self.gTextCounter], True, blk)
         if self.menu_choice_tracker == 3:
-            self.choice1 = self.menu_button.render(list(Choice_list[0].keys())[0], True, bg)
-            self.choice2 = self.menu_button.render(list(Choice_list[0].keys())[1], True, bg)
-            self.choice3 = self.menu_button.render(list(Choice_list[0].keys())[2], True, RED)
+            self.choice1 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[0], True, bg)
+            self.choice2 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[1], True, bg)
+            self.choice3 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[2], True, RED)
+           # self.gText = self.gt_options.render(text_put[self.gTextCounter], True, blk)
         if self.menu_choice_tracker > 3:
             self.menu_choice_tracker = 3
         if self.menu_choice_tracker < 1:
             self.menu_choice_tracker = 1
         print("Tracker at " + str(self.menu_choice_tracker))  # debug info
+        self.gText = self.gt_options.render(text_put[self.gTextCounter], True, blk)
         self.displayGameUI()
 
     def checkInGameInput(self, str):
@@ -151,7 +160,14 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                 self.menu_choice_tracker += 1
                 self.updateGameUI()
         elif (str == "e"):
-            print ("Choice notted update next")
+            choice = list(Choice_list[self.gameChoiceCounter].keys())[self.menu_choice_tracker - 1]
+            print("User chose -> " + choice)
+            print("Updating scene...")
+            self.gameChoiceCounter += 1 # change to next set of choices 
+            
+            self.gTextCounter += 1
+            self.updateGameUI()
+            return choice
 
 class AdvGame(object):
     def __init__(self, mobj, pobj):
@@ -193,7 +209,7 @@ class AdvGame(object):
                 if (self.menuObj.getTracker() == 1 and self.menuObj.getState() == False and self.inGame == False):
                     self.prepInGame()  # starts game now enter will be used to get choices
             else: # this means we are in game!!
-                self.menuObj.checkInGameInput("e")
+               self.p1.addPlayerItem( self.menuObj.checkInGameInput("e"))
 
     def prepInGame(self):
         print ("Now in game!") # debug info
