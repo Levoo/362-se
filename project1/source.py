@@ -10,25 +10,34 @@ pygame.init()
 pygame.font.init()
 event_counter = 0
 
-Choice_list = [ {"Sword":4000, "Gun":1000, "Fish":500}, {"Fight": "e1", "Run": "e1", "Negotiate":"e1"}, {"Sure":3, "Nah":4, "":None},
-                {"Kill":5, "Donate":6, "Give life advice":7}
+Choice_list = [ {"Sword":4000, "Gun":1000, "Fish":500}, {"Fight": "e1", "Run": "e2", "Negotiate":"e3"}, {"Kill":"e4", "Mug":"e5", "Donate":"e6"}
+
               ] # for testing later this shsould be populated from a file
-text_put =  ["You are about to embark on adventure. It’s dangerous to go alone, however. You enter a weapons shop and see various weapons, but only three catch your eye. You can only buy one. Select your weapon.",
-                "You take your <weapon> and set off. At the middle of the mountain path, you are confronted by a highway bandit with a knife. He demands everything you are carrying. What do you do?",
-                "test 2", 
-                "test 3"
+text_put =  [
+                "You are about to embark on adventure. It’s dangerous to go alone, however. You enter a weapons shop and see various weapons, but only three catch your eye. You can only buy one. Select your weapon.",
+                "You take your weapon and set off. At the middle of the mountain path, you are confronted by a highway bandit with a knife. He demands everything you are carrying. What do you do?",
+                "Continuing onward, you come across a poor beggar on the side of the road with a tin can next to him. He looks at you with pleading eyes. What do you do?", 
+                "You arrive into town after trekking a long way from the mountain. The gate guard notices you."
             ]
-event_text = [ ["With your sword, you effortlessly slay the bandit.", 
+event_text = [ 
+               [
+                "With your sword, you effortlessly slay the bandit.", # choose to fight 
                 "The bandit stabs through your banana and pierces your skin. He proceeds to continue stabbing until you take your last breath.", 
                 "Thanks to your large fish, the bandit only manages to cut you, but by some miracle the bone breaks his knife. You lose consciousness, and when you wake up you noticed that you lost 2000 gold.",
                ],
-               ["You attempt to run away and accidentally drop your banana. The bandit slips on the banana and crashes his head into a nearby rock, killing him instantly.",
+               [
+                "You attempt to run away and accidentally drop your banana. The bandit slips on the banana and crashes his head into a nearby rock, killing him instantly.", # choose to run
                 "You flee from the bandit, running past him.",
                 "Unfortunately, due to the sheer weight of the fish, it slows you down and the bandit manages to catch up to you, stabbing you repeatedly in the back until he hits your spine."
                ],
-               ["You attempt to negotiate"
-
-               ] 
+               [
+                   "You attempt to negotiate" # choose to negotiate
+               ],
+               [
+                   "You slaughter the beggar, and take 50 gold he was carrying in his tin can.",
+                   "You tackle the beggar and steal some of his savings.",
+                   "You donate your (item). He smiles and bids you farewell."
+               ], 
              ]
 img_list = ["placeholder.png"]
 
@@ -48,10 +57,14 @@ class playerr(object):
         self.player_flags.append(flag)
     def addPlayerItem(self, newItem):
         self.player_items.append(newItem)
-
+    def resetplayer(self):
+        self.player_coins = 5000
+        self.player_health = 150
+        self.player_flags.clear()
+        self.player_items.clear()
 
 class user_interface(object): # anything with menu in name is exlusive to menu else ingame ui
-    def __init__(self, resolution, title_size, options_size, background, title_text, title_color, c_color,  c1_text ,c2_text, c3_text):
+    def __init__(self, resolution, title_size, options_size, background, title_text, title_color, c_color,  c1_text ,c2_text, c3_text, pObjt):
         self.screen = pygame.display.set_mode(resolution, 0)
         self.resolution = resolution
         self.menu_title = pygame.font.SysFont('Times New Roman', title_size)
@@ -70,6 +83,8 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
         self.menu_choice_tracker = 1
         self.inMenu = False
         self.prepF = False
+        self.inevent = False
+        self.pobjt = pObjt
 
     def updateMainMenu(self):
         # if self.menu_choice_tracker
@@ -169,40 +184,73 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
     
     def updateGameEventUI(self, player_items, coin_amt, eType):
         print("checking event " + str(eType))
-        if eType == "e1":
+        self.inevent = True
+        loop = True
+        if eType == "e3":
             if "Negotiate" in player_items and coin_amt > 2000:
-                self.gText = self.gt_options.render(event_text[event_counter][self.menu_choice_tracker - 1], True, blk)
-                self.choice1 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[0], True, blk)
-                self.choice2 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[1], True, blk)
-                self.choice3 = self.menu_button.render(list(Choice_list[self.gameChoiceCounter].keys())[2], True, blk)
+                self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][event_counter], True, blk)
+                self.choice1 = self.menu_button.render("You give him all of your gold and he lets you be...", True, bg)
+                self.choice2 = self.menu_button.render("", True, bg)
+                self.choice3 = self.menu_button.render("", True, bg)
                 self.displayGameUI()
+                self.pobjt.reducePlayerCoins(self.pobjt.player_coins)
+                while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False
+
             elif "Negotiate" in player_items and coin_amt < 2000:
-                print("dead")
+                self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][event_counter], True, blk)
+                self.choice1 = self.menu_button.render("You dont have enough gold! He Kills you...", True, bg)
+                self.choice2 = self.menu_button.render("", True, bg)
+                self.choice3 = self.menu_button.render("", True, bg)
+                self.displayGameUI()
+                while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False
+                self.gameReset()
+
+    
+    def gameReset(self):
+        self.screen.fill(bg) # set up stuff to start displaying the stuff
+        self.inGame = False
+        self.menu_choice_tracker = 1
+        self.prepF = False
+        self.inMenu = True
+        self.menu_choice_tracker = 1
+        self.gTextCounter = 0
+        self.gameChoiceCounter = 0
+        event_counter = 0
+        self.displayMenu()
 
     def checkInGameInput(self, str):
-        if (str == "l"):
-            if self.menu_choice_tracker > 1:
-                self.menu_choice_tracker -= 1
+        if self.inevent == False:
+            if (str == "l"):
+                if self.menu_choice_tracker > 1:
+                    self.menu_choice_tracker -= 1
+                    self.updateGameUI()
+            elif (str == "r"):
+                if self.menu_choice_tracker < 4:
+                    self.menu_choice_tracker += 1
+                    self.updateGameUI()
+            elif (str == "e"):
+                choice = list(Choice_list[self.gameChoiceCounter].keys())[self.menu_choice_tracker - 1]
+                print("User chose -> " + choice)
+                print("Updating scene...")
+        
+                
+                self.gameChoiceCounter += 1 # change to next set of choices 
+                self.gTextCounter += 1
                 self.updateGameUI()
-        elif (str == "r"):
-            if self.menu_choice_tracker < 4:
-                self.menu_choice_tracker += 1
-                self.updateGameUI()
-        elif (str == "e"):
-            choice = list(Choice_list[self.gameChoiceCounter].keys())[self.menu_choice_tracker - 1]
-            print("User chose -> " + choice)
-            print("Updating scene...")
-    
-            
-            self.gameChoiceCounter += 1 # change to next set of choices 
-            self.gTextCounter += 1
-            self.updateGameUI()
-            vall = list(Choice_list[self.gameChoiceCounter - 1].values())[self.menu_choice_tracker - 1]
-            if type(vall) == int and int(vall) > 0:
+                vall = list(Choice_list[self.gameChoiceCounter - 1].values())[self.menu_choice_tracker - 1]
+                if type(vall) == int and int(vall) > 0:
+                    print (vall)
+                    return choice, int(vall)
                 print (vall)
-                return choice, int(vall)
-            print (vall)
-            return choice, vall
+                return choice, vall
+        else:
+            self.inevent = False
 
 class AdvGame(object):
     def __init__(self, mobj, pobj):
@@ -250,6 +298,7 @@ class AdvGame(object):
                    self.p1.reducePlayerCoins(evnt)
                elif "e" in str(evnt):
                    self.menuObj.updateGameEventUI(self.p1.player_items, self.p1.player_coins, evnt)
+                   pygame.display.update()
 
     def prepInGame(self):
         print ("Now in game!") # debug info
@@ -260,8 +309,8 @@ class AdvGame(object):
         self.menuObj.displayGameUI()
 
 def main():
-    ui = user_interface(res, 50, 35, bg, "MENU", (0, 0, 0), (0, 0, 0), "START", "CREDITS", "QUIT")
     player_one = playerr()
+    ui = user_interface(res, 50, 35, bg, "MENU", (0, 0, 0), (0, 0, 0), "START", "CREDITS", "QUIT", player_one)
     #menu.displayMenu()
     game = AdvGame(ui, player_one)
     game.startGame()
