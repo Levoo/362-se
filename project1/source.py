@@ -10,7 +10,7 @@ pygame.init()
 pygame.font.init()
 event_counter = 0
 
-Choice_list = [ {"Sword":4000, "Banana":1000, "Fish":500}, {"Fight": "e1", "Run": "e2", "Negotiate":"e3"}, {"Kill":"e4", "Mug":"e5", "Donate":"e6"}
+Choice_list = [ {"Sword":4000, "Banana":1000, "Fish":500}, {"Fight": "e1", "Run": "e2", "Negotiate":"e3"}, {"Kill":"e4", "Mug":"e4", "Donate":"e4"}
 
               ] # for testing later this shsould be populated from a file
 text_put =  [
@@ -26,8 +26,8 @@ event_text = [
                 "Thanks to your large fish, the bandit only manages to cut you, but by some miracle the bone breaks his knife. You lose consciousness, and when you wake up you noticed that you lost 2000 gold.", # kinda alive
                ],
                [
-                "You attempt to run away and accidentally drop your banana. The bandit slips on the banana and crashes his head into a nearby rock, killing him instantly.", # choose to run
                 "You flee from the bandit, running past him.",
+                "You attempt to run away and accidentally drop your banana. The bandit slips on the banana and crashes his head into a nearby rock, killing him instantly.", # choose to run
                 "Unfortunately, due to the sheer weight of the fish, it slows you down and the bandit manages to catch up to you, stabbing you repeatedly in the back until he hits your spine."
                ],
                [
@@ -219,7 +219,27 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
             if "Banana" in self.pobjt.player_items:
                 self.gameReset()
         if eType == "e2":
-            pass
+            self.choice1 = self.menu_button.render("", True, bg)
+            if "Sword" in self.pobjt.player_items:
+                self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][0], True, blk)
+                self.choice1 = self.menu_button.render("That was easy...", True, bg)
+            if "Banana" in self.pobjt.player_items:
+                self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][1], True, blk)
+                self.choice1 = self.menu_button.render("You search the corpse and get 500 gold and a key", True, bg)
+                self.pobjt.addPlayerItem("Key")
+                self.pobjt.addPlayerCoins(500)
+            if "Fish" in self.pobjt.player_items:
+                self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][2], True, blk)
+                self.choice1 = self.menu_button.render("You've died...", True, bg)
+            
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False
         if eType == "e3":
             if "Negotiate" in player_items and coin_amt > 2000:
                 self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][event_counter], True, blk)
@@ -245,7 +265,8 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                             loop = False
                 self.gameReset()
         if eType == "e4":
-            pass
+            if "Kill" in self.pobjt.player_items:
+                pass
         if eType == "e5":
             pass
         if eType == "e6":
