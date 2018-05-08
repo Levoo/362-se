@@ -10,7 +10,7 @@ pygame.init()
 pygame.font.init()
 event_counter = 0
 
-Choice_list = [ {"Sword":4000, "Gun":1000, "Fish":500}, {"Fight": "e1", "Run": "e2", "Negotiate":"e3"}, {"Kill":"e4", "Mug":"e5", "Donate":"e6"}
+Choice_list = [ {"Sword":4000, "Banana":1000, "Fish":500}, {"Fight": "e1", "Run": "e2", "Negotiate":"e3"}, {"Kill":"e4", "Mug":"e5", "Donate":"e6"}
 
               ] # for testing later this shsould be populated from a file
 text_put =  [
@@ -22,8 +22,8 @@ text_put =  [
 event_text = [ 
                [
                 "With your sword, you effortlessly slay the bandit.", # choose to fight 
-                "The bandit stabs through your banana and pierces your skin. He proceeds to continue stabbing until you take your last breath.", 
-                "Thanks to your large fish, the bandit only manages to cut you, but by some miracle the bone breaks his knife. You lose consciousness, and when you wake up you noticed that you lost 2000 gold.",
+                "The bandit stabs through your banana and pierces your skin. He proceeds to continue stabbing until you take your last breath.", # dead
+                "Thanks to your large fish, the bandit only manages to cut you, but by some miracle the bone breaks his knife. You lose consciousness, and when you wake up you noticed that you lost 2000 gold.", # kinda alive
                ],
                [
                 "You attempt to run away and accidentally drop your banana. The bandit slips on the banana and crashes his head into a nearby rock, killing him instantly.", # choose to run
@@ -53,10 +53,14 @@ class playerr(object):
         self.player_health -= damage
     def reducePlayerCoins(self, amt):
         self.player_coins -= amt
+        if self.player_coins < 0:
+            self.player_coins = 0
     def addPlayerFlag(self, flag):
         self.player_flags.append(flag)
     def addPlayerItem(self, newItem):
         self.player_items.append(newItem)
+    def addPlayerCoins(self, amt):
+        self.player_coins += amt
     def resetplayer(self):
         self.player_coins = 5000
         self.player_health = 150
@@ -122,7 +126,7 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
             elif(self.menu_choice_tracker == 2):
                 print("Pseudo-credit screen")
             else:
-                print("Pseudo-quit...")
+                sys.exit(1)
 
     def displayMenu(self): # move to adventrue game
         self.screen.blit(self.title, ( self.resolution[0] / 2 - 55,  self.resolution[1] / 2 - 200))
@@ -186,6 +190,36 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
         print("checking event " + str(eType))
         self.inevent = True
         loop = True
+        if eType == "e1":
+            self.gText = self.gt_options.render("A struggle ensues...", True, blk)
+            if "Fish" in self.pobjt.player_items:
+                self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][2], True, blk)
+                self.choice1 = self.menu_button.render("", True, bg)
+                self.pobjt.reducePlayerCoins(2000)
+                print ("player loses 2k gold")
+
+            elif "Banana" in self.pobjt.player_items:
+                self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][1], True, blk)
+                self.choice1 = self.menu_button.render("You've died...", True, bg)
+                print ("dead reset game...")
+            else:
+                self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][0], True, blk)
+                self.choice1 = self.menu_button.render("You search the corpse and get 500 gold and a key", True, bg)
+                self.pobjt.addPlayerItem("Key")
+                self.pobjt.addPlayerCoins(500)
+
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False
+            if "Banana" in self.pobjt.player_items:
+                self.gameReset()
+        if eType == "e2":
+            pass
         if eType == "e3":
             if "Negotiate" in player_items and coin_amt > 2000:
                 self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][event_counter], True, blk)
@@ -210,7 +244,20 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                         if event.type == pygame.KEYDOWN:
                             loop = False
                 self.gameReset()
-
+        if eType == "e4":
+            pass
+        if eType == "e5":
+            pass
+        if eType == "e6":
+            pass
+        if eType == "e7":
+            pass
+        if eType == "e8":
+            pass
+        if eType == "e9":
+            pass
+        if eType == "e10":
+            pass
     
     def gameReset(self):
         self.screen.fill(bg) # set up stuff to start displaying the stuff
