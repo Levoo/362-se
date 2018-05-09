@@ -10,14 +10,21 @@ pygame.init()
 pygame.font.init()
 event_counter = 0
 
-Choice_list = [ {"Sword":4000, "Banana":1000, "Fish":500}, {"Fight": "e1", "Run": "e2", "Negotiate":"e3"}, {"Kill":"e4", "Mug":"e4", "Donate":"e4"}
-
+Choice_list = [ {"Sword":4000, "Banana":1000, "Fish":500}, {"Fight": "e1", "Run": "e2", "Negotiate":"e3"}, {"Kill":"e4", "Mug":"e4", "Donate":"e4"}, {"Talk to him": "e5", "Ignore": "e5", "Attack": "e5"},
+                 {"Arena":"e6", "Service task":"e6", "Death": "e6"}, {"Chop":"e7", "Parry": "e7", "Slash":"e7"}, {"Chop":"e7", "Parry": "e7", "Slash":"e7"}, {"Chop":"e7", "Parry": "e7", "Slash":"e7"},
+                 {"Accept":"e8", "Decline":"e8", "Ignore":"e8"}
               ] # for testing later this shsould be populated from a file
 text_put =  [
                 "You are about to embark on adventure. It’s dangerous to go alone, however. You enter a weapons shop and see various weapons, but only three catch your eye. You can only buy one. Select your weapon.",
                 "You take your weapon and set off. At the middle of the mountain path, you are confronted by a highway bandit with a knife. He demands everything you are carrying. What do you do?",
                 "Continuing onward, you come across a poor beggar on the side of the road with a tin can next to him. He looks at you with pleading eyes. What do you do?", 
-                "You arrive into town after trekking a long way from the mountain. The gate guard notices you."
+                "You arrive into town after trekking a long way from the mountain. The gate guard notices you.",
+                "Unfortunately, because of your crimes you have been sentenced to death, but the lord decided to give you an offer: the choice to fight for your freedom  or complete a task.",
+                "All you are given is a basic sword, you’re now faced with a life threatening gladiator! You have been restored to full health. Fight!",
+                "The second gladiator approches",
+                "At last the final round!",
+                "A guard approaches you, asking if you are willing to embark on a dangerous task, with a reward of a massive fortune, and honor.", # cxontinue onward
+                "Test"
             ]
 event_text = [ 
                [
@@ -34,10 +41,24 @@ event_text = [
                    "You attempt to negotiate" # choose to negotiate
                ],
                [
-                   "You slaughter the beggar, and take 50 gold he was carrying in his tin can.",
+                   "You slaughter the beggar, and take 50 g.old he was carrying in his tin can.",
                    "You tackle the beggar and steal some of his savings.",
-                   "You donate your (item). He smiles and bids you farewell."
+                   "You donate your some change. He smiles and bids you farewell."
                ], 
+               [
+                   "Taking up his sword, he swings and decapitates you while shouting that the beggar you killed in the mountain was his fourth cousin’s twice removed uncle that fell in debt, and he can’t collect.",# dead
+                   "With a shout, four more guards tackle you down and arrest you, the guard takes your belongings and you are sent to prison.", #skip to prison scene
+                   "The guard through his helmet judges you silently as you pass into the town." # cont to chest
+               ],
+               [
+                   "opening it revealed: Armor, Elixir, and 10000 gold", # chest scene
+                   "Unfortinantly you dont have the key and continue onward."
+               ],
+               [
+                   "You swiftly chop the first contender and move on to the next.",
+                   "You succecfully dodge the second warriors attacks, easily allowing you to finish him while he catches his breath.",
+                   "You quickly overpower the last contender with your speed as you slash away!"
+               ],
              ]
 img_list = ["placeholder.png"]
 
@@ -204,8 +225,8 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                 print ("dead reset game...")
             else:
                 self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][0], True, blk)
-                self.choice1 = self.menu_button.render("You search the corpse and get 500 gold and a key", True, bg)
-                self.pobjt.addPlayerItem("Key")
+                self.choice1 = self.menu_button.render("You search the corpse and get 500 gold", True, bg)
+                #self.pobjt.addPlayerItem("Key")
                 self.pobjt.addPlayerCoins(500)
 
             self.choice2 = self.menu_button.render("", True, bg)
@@ -225,7 +246,7 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                 self.choice1 = self.menu_button.render("That was easy...", True, bg)
             if "Banana" in self.pobjt.player_items:
                 self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][1], True, blk)
-                self.choice1 = self.menu_button.render("You search the corpse and get 500 gold and a key", True, bg)
+                self.choice1 = self.menu_button.render("You search the corpse and get 500 gold", True, bg)
                 self.pobjt.addPlayerItem("Key")
                 self.pobjt.addPlayerCoins(500)
             if "Fish" in self.pobjt.player_items:
@@ -240,6 +261,8 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                     for event in pygame.event.get():
                         if event.type == pygame.KEYDOWN:
                             loop = False
+            if "Fish" in self.pobjt.player_items:
+                self.gameReset()
         if eType == "e3":
             if "Negotiate" in player_items and coin_amt > 2000:
                 self.gText = self.gt_options.render(event_text[self.menu_choice_tracker - 1][event_counter], True, blk)
@@ -266,10 +289,56 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                 self.gameReset()
         if eType == "e4":
             if "Kill" in self.pobjt.player_items:
-                pass
+                self.gText = self.gt_options.render(event_text[3][0], True, blk)
+                self.choice1 = self.menu_button.render("You leave his cold body and move on...", True, bg)
+                self.pobjt.addPlayerFlag("WK")
+            if "Mug" in self.pobjt.player_items:
+                self.gText = self.gt_options.render(event_text[3][1], True, blk)
+                self.choice1 = self.menu_button.render("You leave the poor man in a scared state...", True, bg)
+                self.pobjt.addPlayerFlag("BK")
+            if "Donate" in self.pobjt.player_items:
+                self.gText = self.gt_options.render(event_text[3][2], True, blk)
+                self.choice1 = self.menu_button.render("You feel a little fuzzy inside...", True, bg) 
+                self.pobjt.addPlayerFlag("GK")
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False   
         if eType == "e5":
-            pass
-        if eType == "e6":
+            if "Talk to him" in self.pobjt.player_items and "GK" in self.pobjt.player_flags:
+                self.gText = self.gt_options.render(event_text[4][2], True, blk)
+                self.choice1 = self.menu_button.render("you pass along and into town.", True, bg)
+                self.gameChoiceCounter += 4
+                self.gTextCounter += 4
+            if "Talk to him" in self.pobjt.player_items and "BK" in self.pobjt.player_flags:
+                self.gText = self.gt_options.render(event_text[4][1], True, blk)
+                self.choice1 = self.menu_button.render("You think back to the begger. Damn it.", True, bg)
+
+            if "Talk to him" in self.pobjt.player_items and "WK" in self.pobjt.player_flags:
+                self.gText = self.gt_options.render(event_text[4][0], True, blk)
+                self.choice1 = self.menu_button.render("Such is life you say. You die.", True, bg)
+            if "Ignore" in self.pobjt.player_items:
+                self.gText = self.gt_options.render(event_text[4][1], True, blk)
+                self.choice1 = self.menu_button.render("I should of acted less suspicious", True, bg)
+                
+            if "Attack" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("The guard counters and slashes through you", True, blk)
+                self.choice1 = self.menu_button.render("You slowly drift away.", True, bg)
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False  
+            if "Attack" in self.pobjt.player_items or "WK" in self.pobjt.player_flags:
+                self.gameReset()
+        if eType == "e6": # arean service task or death
             pass
         if eType == "e7":
             pass
@@ -290,19 +359,20 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
         self.gTextCounter = 0
         self.gameChoiceCounter = 0
         event_counter = 0
+        self.pobjt.resetplayer()
         self.displayMenu()
 
-    def checkInGameInput(self, str):
+    def checkInGameInput(self, strr):
         if self.inevent == False:
-            if (str == "l"):
+            if (strr == "l"):
                 if self.menu_choice_tracker > 1:
                     self.menu_choice_tracker -= 1
                     self.updateGameUI()
-            elif (str == "r"):
+            elif (strr == "r"):
                 if self.menu_choice_tracker < 4:
                     self.menu_choice_tracker += 1
                     self.updateGameUI()
-            elif (str == "e"):
+            elif (strr == "e"):
                 choice = list(Choice_list[self.gameChoiceCounter].keys())[self.menu_choice_tracker - 1]
                 print("User chose -> " + choice)
                 print("Updating scene...")
@@ -310,6 +380,7 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                 
                 self.gameChoiceCounter += 1 # change to next set of choices 
                 self.gTextCounter += 1
+                print ("Text_put at: " + str(self.gTextCounter))
                 self.updateGameUI()
                 vall = list(Choice_list[self.gameChoiceCounter - 1].values())[self.menu_choice_tracker - 1]
                 if type(vall) == int and int(vall) > 0:
