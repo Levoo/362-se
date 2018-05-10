@@ -11,8 +11,9 @@ pygame.font.init()
 event_counter = 0
 
 Choice_list = [ {"Sword":4000, "Banana":1000, "Fish":500}, {"Fight": "e1", "Run": "e2", "Negotiate":"e3"}, {"Kill":"e4", "Mug":"e4", "Donate":"e4"}, {"Talk to him": "e5", "Ignore": "e5", "Attack": "e5"},
-                 {"Arena":"e6", "Service task":"e6", "Death": "e6"}, {"Chop":"e7", "Parry": "e7", "Slash":"e7"}, {"Chop":"e7", "Parry": "e7", "Slash":"e7"}, {"Chop":"e7", "Parry": "e7", "Slash":"e7"},
-                 {"Accept":"e8", "Decline":"e8", "Ignore":"e8"}
+                 {"Arena":"e6", "Service task":"e6", "Death": "e6"}, {"Chop":"e7", "Parry": "e7", "Slash":"e7"}, {"Chop":"e8", "Parry": "e8", "Slash":"e8"}, {"Chop":"e9", "Parry": "e9", "Slash":"e9"},
+                 {"Accept":"e10", "Decline":"e10", "Ignore":"e10"}, {"Chop":"e11", "Parry": "e11", "Slash":"e11"}, {"Chop":"e12", "Parry": "e12", "Slash":"e12"}, {"Chop":"e13", "Parry": "e13", "Slash":"e13"},
+                 {"Fight": "e14", "Reason": "e14", "Join him": "e14"}, {"The End": "e15", ".": "e15", "..":"e15"}
               ] # for testing later this shsould be populated from a file
 text_put =  [
                 "You are about to embark on adventure. It’s dangerous to go alone, however. You enter a weapons shop and see various weapons, but only three catch your eye. You can only buy one. Select your weapon.",
@@ -20,11 +21,15 @@ text_put =  [
                 "Continuing onward, you come across a poor beggar on the side of the road with a tin can next to him. He looks at you with pleading eyes. What do you do?", 
                 "You arrive into town after trekking a long way from the mountain. The gate guard notices you.",
                 "Unfortunately, because of your crimes you have been sentenced to death, but the lord decided to give you an offer: the choice to fight for your freedom  or complete a task.",
-                "All you are given is a basic sword, you’re now faced with a life threatening gladiator! You have been restored to full health. Fight!",
+                "All you are given is a basic sword, you’re now faced with a life threatening gladiator! The first gladiator approches. Fight!",
                 "The second gladiator approches",
                 "At last the final round!",
-                "A guard approaches you, asking if you are willing to embark on a dangerous task, with a reward of a massive fortune, and honor.", # cxontinue onward
-                "Test"
+                "As you walk a guard approaches you, asking if you are willing to embark on a dangerous task, with a reward of a massive fortune, and honor.", # cxontinue onward
+                "Along the path you encountere Rebel Soldiers!", 
+                "Again you are confronted with Lizard man?!",
+                "Almost to the dragons lair you encounter a dragon hatchling!",
+                "Faced with the terrifying beast, you grip your sword tightly.",
+                "END"
             ]
 event_text = [ 
                [
@@ -50,14 +55,33 @@ event_text = [
                    "With a shout, four more guards tackle you down and arrest you, the guard takes your belongings and you are sent to prison.", #skip to prison scene
                    "The guard through his helmet judges you silently as you pass into the town." # cont to chest
                ],
-               [
-                   "opening it revealed: Armor, Elixir, and 10000 gold", # chest scene
-                   "Unfortinantly you dont have the key and continue onward."
+               [ # 5
+                   "You swiftly chop the first contender and move on to the next.",
+                   "You succecfully dodge the second warriors attacks, easily allowing you to finish him while he catches his breath. The crowd cheers as you are set free!",
+                   "You quickly overpower the last contender with your speed as you slash away!"
+               ],
+               [ 
+                   "You look at him and accept the challenge..."
+               ],
+               [ # rebes use parry
+                   "You get the rebels attention by dogging every attack, allowing your group of men to attack in mass.",
+                   "You chop one and other but are soon overwhelmed the group survies but you dont...",
+                   "The rebels are skilled and dodge your swift slashes, you're caught by a counter and parish!"
+               ],
+               [ #lizard man use slash
+                    "",
+                    "",
+                    ""
+               ],
+               [# hatchinling use chop
+                    "",
+                    "",
+                    ""
                ],
                [
-                   "You swiftly chop the first contender and move on to the next.",
-                   "You succecfully dodge the second warriors attacks, easily allowing you to finish him while he catches his breath.",
-                   "You quickly overpower the last contender with your speed as you slash away!"
+                   "",
+                   "",
+                   "",
                ],
              ]
 img_list = ["placeholder.png"]
@@ -339,15 +363,138 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
             if "Attack" in self.pobjt.player_items or "WK" in self.pobjt.player_flags:
                 self.gameReset()
         if eType == "e6": # arean service task or death
-            pass
-        if eType == "e7":
-            pass
-        if eType == "e8":
-            pass
-        if eType == "e9":
-            pass
+            if "Arena" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("They take you to the arena...", True, blk)
+                self.choice1 = self.menu_button.render("Should of kept to myself.", True, bg)
+            elif "Service task" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("The lord nods to a guard. You prepare to travel to a dragons lair", True, blk)
+                self.choice1 = self.menu_button.render("Hopefully this task is easy..", True, bg)
+                self.gameChoiceCounter += 4
+                self.gTextCounter += 4
+            else:# death
+                self.gText = self.gt_options.render("You choose death. The guard slashes through you", True, blk)
+                self.choice1 = self.menu_button.render("You slowly drift away.", True, bg)
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False  
+            if "Death" in self.pobjt.player_items:
+                self.gameReset()
+        if eType == "e7": # chop slash parry
+            if "Chop" in self.pobjt.player_items:#
+                self.pobjt.player_items.remove("Chop")
+                self.gText = self.gt_options.render(event_text[5][0], True, blk)
+                self.choice1 = self.menu_button.render("One down two to go!", True, bg)
+            if "Parry" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("The contender keeps up with you until your run out of energy. Slashing you as you catch your breath!", True, blk)
+                self.choice1 = self.menu_button.render("...", True, bg)
+            if "Slash" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("The gladiator counters your slash and stabs you!", True, blk)
+                self.choice1 = self.menu_button.render("Oh well...", True, bg)
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False 
+            if "Parry" in self.pobjt.player_items or "Slash" in self.pobjt.player_items:
+                self.gameReset()
+        if eType == "e8": # chop slash parry
+            if "Chop" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("The gladiator counters your chop and stabs you!", True, blk)
+                self.choice1 = self.menu_button.render("Oh well...", True, bg)
+            if "Parry" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("The contender keeps up with you until your run out of energy. Slashing you as you catch your breath!", True, blk)
+                self.choice1 = self.menu_button.render("...", True, bg)
+            if "Slash" in self.pobjt.player_items: #
+                self.pobjt.player_items.remove("Slash")
+                self.gText = self.gt_options.render(event_text[5][2], True, blk)
+                self.choice1 = self.menu_button.render("Welp, that was easy", True, bg)
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False  
+            if "Chop" in self.pobjt.player_items or "Parry" in self.pobjt.player_items:
+                self.gameReset()
+        if eType == "e9": # chop slash parry
+            if "Chop" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("The gladiator counters your chop and stabs you!", True, blk)
+                self.choice1 = self.menu_button.render("Oh well...", True, bg)
+            if "Parry" in self.pobjt.player_items:#
+                self.pobjt.player_items.remove("Parry")
+                self.gText = self.gt_options.render(event_text[5][1], True, blk)
+                self.choice1 = self.menu_button.render("That was fun!", True, bg)
+            if "Slash" in self.pobjt.player_items:
+                self.gText = self.gt_options.render("The gladiator counters your slash and stabs you!", True, blk)
+                self.choice1 = self.menu_button.render("Oh well...", True, bg)
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False  
+            if "Chop" in self.pobjt.player_items or "Slash" in self.pobjt.player_items:
+                self.gameReset()
         if eType == "e10":
-            pass
+            if "Accept" in self.pobjt.player_items:
+                pass
+            if "Decline" in self.pobjt.player_items:
+                pass
+            if "Ignore" in self.pobjt.player_items:
+                pass
+        if eType == "e11":
+            if "Chop" in self.pobjt.player_items:
+                self.pobjt.player_items.remove("Chop")
+            if "Parry" in self.pobjt.player_items:
+                pass
+            if "Slash" in self.pobjt.player_items:
+                pass
+        if eType == "e12":
+            if "Chop" in self.pobjt.player_items:
+                self.pobjt.player_items.remove("Chop")
+            if "Parry" in self.pobjt.player_items:
+                pass
+            if "Slash" in self.pobjt.player_items:
+                pass
+        if eType == "e13":
+            if "Chop" in self.pobjt.player_items:
+                self.pobjt.player_items.remove("Chop")
+            if "Parry" in self.pobjt.player_items:
+                pass
+            if "Slash" in self.pobjt.player_items:
+                pass
+        if eType == "e14":
+            if "Fight" in self.pobjt.player_items:
+                pass
+            if "Reason" in self.pobjt.player_items:
+                pass
+            if "Join him" in self.pobjt.player_items:
+                pass
+            self.gText = self.gt_options.render("Thats all folks!", True, blk)
+            self.choice1 = self.menu_button.render("You slowly drift away.", True, bg)
+            self.choice2 = self.menu_button.render("", True, bg)
+            self.choice3 = self.menu_button.render("", True, bg)
+            self.displayGameUI()
+
+            while(loop):
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            loop = False  
+            self.gameReset()
+        if eType == "e15":
+           pass
     
     def gameReset(self):
         self.screen.fill(bg) # set up stuff to start displaying the stuff
@@ -381,6 +528,7 @@ class user_interface(object): # anything with menu in name is exlusive to menu e
                 self.gameChoiceCounter += 1 # change to next set of choices 
                 self.gTextCounter += 1
                 print ("Text_put at: " + str(self.gTextCounter))
+                print("GchoiceCoutner at: " + str(self.gameChoiceCounter))
                 self.updateGameUI()
                 vall = list(Choice_list[self.gameChoiceCounter - 1].values())[self.menu_choice_tracker - 1]
                 if type(vall) == int and int(vall) > 0:
